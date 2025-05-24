@@ -2,8 +2,10 @@ import KeyAlerts from "@/components/welcome-home/key-alerts";
 import RecentActivity from "@/components/welcome-home/recent-activity";
 import Shortcuts from "@/components/welcome-home/shortcuts";
 import RepositoryHealthSnapshot from "@/components/welcome-home/repository-health-snapshot";
+import { auth } from "@/server/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
   return (
     <main className="py-8">
       {/* Hero Section with Enhanced Styling */}
@@ -11,7 +13,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-3xl blur-xl" />
         <div className="relative glass-card rounded-3xl p-8 hover-lift">
           <h2 className="text-5xl font-bold tracking-tight mb-4 text-gradient">
-            Welcome back, User!
+            {session?.user.name
+              ? `Welcome back, ${session?.user.name}!`
+              : "Welcome to Genini!"}
           </h2>
           <p className="text-xl text-muted-foreground">
             Here's your personalized overview of GitHub.
@@ -56,7 +60,7 @@ export default function Home() {
         >
           {/* Animated background */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-accent/80 rounded-2xl blur-sm group-hover:blur-md transition-all duration-300" />
-          
+
           {/* Content */}
           <div className="relative flex items-center gap-3">
             <svg
@@ -75,10 +79,13 @@ export default function Home() {
             </svg>
             <span className="text-lg font-bold tracking-wide">AI Agent</span>
           </div>
-          
+
           {/* Floating particles effect */}
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-ping" />
-          <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-primary rounded-full animate-ping" style={{animationDelay: '1s'}} />
+          <div
+            className="absolute -bottom-1 -left-1 w-2 h-2 bg-primary rounded-full animate-ping"
+            style={{ animationDelay: "1s" }}
+          />
         </button>
       </div>
     </main>
