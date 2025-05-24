@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Onboarding Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #101a23;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #182533;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: white;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            background-color: #223649;
+            border: 1px solid #314d68;
+            color: white;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3d98f4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #223649;
+            cursor: not-allowed;
+        }
+        .card {
+            background-color: #223649;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: white;
+        }
+        .card p {
+            color: #90adcb;
+        }
+        .card ul {
+            color: #90adcb;
+        }
+        .progress-container {
+            height: 8px;
+            background-color: #314d68;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #3d98f4;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        .progress-text span:first-child {
+            color: #90adcb;
+        }
+        .progress-text span:last-child {
+            color: #3d98f4;
+            font-weight: bold;
+        }
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .loader-text {
+            color: #90adcb;
+            margin-top: 10px;
+        }
+        .spinner {
+            border: 4px solid rgba(61, 152, 244, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3d98f4;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Onboarding Generator</h1>
+        <p>Generate a personalized onboarding path for any GitHub repository with real-time progress tracking.</p>
+        
+        <form id="repoForm">
+            <div>
+                <label for="repo_url">GitHub Repository URL:</label>
+                <input type="text" id="repo_url" name="repo_url" 
+                       placeholder="https://github.com/username/repository" 
+                       value="{{ repo_url }}" required>
+            </div>
+            <div>
+                <label for="experience">Experience Level:</label>
+                <select id="experience" name="experience">
+                    <option value="beginner" {% if experience == 'beginner' %}selected{% endif %}>Beginner</option>
+                    <option value="intermediate" {% if experience == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                    <option value="advanced" {% if experience == 'advanced' %}selected{% endif %}>Advanced</option>
+                </select>
+            </div>
+            <button type="submit" id="generateBtn">Generate Onboarding Path</button>
+        </form>
+        
+        <div id="loader" class="loader">
+            <div class="card">
+                <h3>Generating Onboarding Path</h3>
+                <div class="progress-container">
+                    <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progress-message">Initializing...</span>
+                    <span id="progress-percentage">0%</span>
+                </div>
+            </div>
+            <div class="spinner"></div>
+            <p class="loader-text">Please wait while we analyze the repository and generate your personalized onboarding path...</p>
+        </div>
+        
+        <div id="results" class="results">
+            <h2>Generated Onboarding Path</h2>
+            
+            <div class="card">
+                <h3>Overall Progress</h3>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 25%"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Getting Started</span>
+                    <span>25%</span>
+                </div>
+            </div>
+            
+            <div id="chapters-container"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Generate a random client ID for WebSocket connection
+        const clientId = Math.random().toString(36).substring(2, 15);
+        let socket;
+        
+        document.getElementById('repoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const repoUrl = document.getElementById('repo_url').value;
+            const experience = document.getElementById('experience').value;
+            const generateBtn = document.getElementById('generateBtn');
+            const loader = document.getElementById('loader');
+            const results = document.getElementById('results');
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = document.getElementById('progress-percentage');
+            const progressMessage = document.getElementById('progress-message');
+            
+            // Reset UI
+            generateBtn.disabled = true;
+            loader.style.display = 'block';
+            results.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressPercentage.textContent = '0%';
+            progressMessage.textContent = 'Initializing...';
+            
+            // Connect to WebSocket
+            socket = new WebSocket(`ws://${window.location.host}/ws/${clientId}`);
+            
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                progressBar.style.width = `${data.progress}%`;
+                progressPercentage.textContent = `${data.progress}%`;
+                progressMessage.textContent = data.message;
+                
+                // When complete, show results
+                if (data.progress >= 100) {
+                    setTimeout(() => {
+                        fetchResults(repoUrl, experience, clientId);
+                    }, 500);
+                }
+            };
+            
+            // Start the generation process
+            await fetch(`/generate?repo_url=${encodeURIComponent(repoUrl)}&experience=${experience}&client_id=${clientId}`);
+        });
+        
+        async function fetchResults(repoUrl, experience, clientId) {
+            try {
+                const response = await fetch(`/results/${clientId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Render chapters
+                    const chaptersContainer = document.getElementById('chapters-container');
+                    chaptersContainer.innerHTML = '';
+                    
+                    data.chapters.forEach(chapter => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        
+                        let html = `<h3>${chapter.id}. ${chapter.title}</h3>`;
+                        html += `<p>${chapter.description}</p>`;
+                        
+                        html += `<h4>Tasks:</h4>`;
+                        html += '<ul>';
+                        chapter.tasks.forEach(task => {
+                            html += `<li>${task}</li>`;
+                        });
+                        html += '</ul>';
+                        
+                        html += `<h4>Tips:</h4>`;
+                        html += '<ul>';
+                        chapter.tips.forEach(tip => {
+                            html += `<li>${tip}</li>`;
+                        });
+                        html += '</ul>';
+                        
+                        html += `<h4>Next Steps:</h4>`;
+                        html += `<p>${chapter.next_steps}</p>`;
+                        
+                        card.innerHTML = html;
+                        chaptersContainer.appendChild(card);
+                    });
+                    
+                    // Show results and hide loader
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('generateBtn').disabled = false;
+                    
+                    // Close WebSocket
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        socket.close();
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching results:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+    

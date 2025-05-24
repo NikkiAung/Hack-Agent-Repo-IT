@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Onboarding Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #101a23;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #182533;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: white;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            background-color: #223649;
+            border: 1px solid #314d68;
+            color: white;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3d98f4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .card {
+            background-color: #223649;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: white;
+        }
+        .card p {
+            color: #90adcb;
+        }
+        .card ul {
+            color: #90adcb;
+        }
+        .progress-container {
+            height: 8px;
+            background-color: #314d68;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #3d98f4;
+            border-radius: 4px;
+            width: 25%;
+        }
+        .results {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Onboarding Generator</h1>
+        
+        <form method="post">
+            <div>
+                <label for="repo_url">GitHub Repository URL:</label>
+                <input type="text" id="repo_url" name="repo_url" 
+                       placeholder="https://github.com/username/repository" 
+                       value="{{ repo_url }}">
+            </div>
+            <div>
+                <label for="experience">Experience Level:</label>
+                <select id="experience" name="experience">
+                    <option value="beginner" {% if experience == 'beginner' %}selected{% endif %}>Beginner</option>
+                    <option value="intermediate" {% if experience == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                    <option value="advanced" {% if experience == 'advanced' %}selected{% endif %}>Advanced</option>
+                </select>
+            </div>
+            <button type="submit">Generate Onboarding Path</button>
+        </form>
+        
+        {% if generated %}
+        <div class="results">
+            <h2>Generated Onboarding Path</h2>
+            
+            <div class="card">
+                <h3>Overall Progress</h3>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 25%;"></div>
+                </div>
+                <p>25% Complete - Getting Started</p>
+            </div>
+            
+            {% for chapter in chapters %}
+            <div class="card">
+                <h3>{{ chapter.id }}. {{ chapter.title }}</h3>
+                <p>{{ chapter.description }}</p>
+                
+                <h4>Tasks:</h4>
+                <ul>
+                    {% for task in chapter.tasks %}
+                    <li>{{ task }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h4>Tips:</h4>
+                <ul>
+                    {% for tip in chapter.tips %}
+                    <li>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h4>Next Steps:</h4>
+                <p>{{ chapter.next_steps }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Add animation for progress bar
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const currentWidth = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.transition = 'width 1s ease-in-out';
+                    bar.style.width = currentWidth;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+/* LearningPath.module.css */
+
+.container {
+  background-color: #101a23;
+  color: white;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.generateButton {
+  background-color: #3d98f4;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.875rem;
+}
+
+.generateButton:hover {
+  background-color: #2d88e4;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.spinner {
+  border: 4px solid rgba(61, 152, 244, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #3d98f4;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  color: #f44336;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 1rem;
+  background-color: rgba(244, 67, 54, 0.1);
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.error {
+  color: #f44336;
+}
+
+.repoInfo {
+  background-color: #182533;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.repoName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 0.5rem;
+}
+
+.repoDescription {
+  color: #90adcb;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.repoLink {
+  display: inline-block;
+  color: #3d98f4;
+  font-size: 0.875rem;
+  text-decoration: none;
+  margin-top: 0.5rem;
+  transition: color 0.2s;
+}
+
+.repoLink:hover {
+  color: #2d88e4;
+  text-decoration: underline;
+}
+
+.overallProgress {
+  background-color: #182533;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.overallProgress h2 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.progressBarContainer {
+  height: 0.625rem;
+  background-color: #314d68;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: #3d98f4;
+  border-radius: 0.375rem;
+  transition: width 0.5s ease-in-out;
+}
+
+.progressPercentage {
+  color: #3d98f4;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.onboardingSummary {
+  margin-bottom: 2.5rem;
+}
+
+.summaryTitle {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.summaryCard {
+  background-color: #182533;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.summaryCard h3 {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #314d68;
+}
+
+.summaryCard p {
+  color: #90adcb;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.summaryCard strong {
+  color: white;
+  font-weight: 500;
+}
+
+.chaptersTitle {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+}
+
+.chapters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chapter {
+  background-color: #182533;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.chapter:hover {
+  box-shadow: 0 6px 12px rgba(61, 152, 244, 0.2);
+}
+
+.chapter.expanded {
+  box-shadow: 0 8px 16px rgba(61, 152, 244, 0.25);
+}
+
+.chapterHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  cursor: pointer;
+}
+
+.chapterHeaderContent {
+  flex-grow: 1;
+}
+
+.chapterIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #223649;
+  border-radius: 0.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  color: white;
+}
+
+.expandIcon {
+  color: #90adcb;
+  transition: transform 0.3s ease;
+}
+
+.chapter.expanded .expandIcon {
+  color: white;
+}
+
+.chapterTitle {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.chapterProgressContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chapterProgressContainer .progressBarContainer {
+  flex-grow: 1;
+  max-width: 10rem;
+  height: 0.375rem;
+}
+
+.chapterProgressContainer .progressPercentage {
+  min-width: 2rem;
+  text-align: right;
+}
+
+.chapterContent {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid #223649;
+}
+
+.chapterDescription {
+  color: #90adcb;
+  font-size: 0.875rem;
+  margin: 0.75rem 0;
+  line-height: 1.5;
+}
+
+.section {
+  margin-top: 1.5rem;
+}
+
+.section h4 {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+
+.list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list li {
+  color: #90adcb;
+  font-size: 0.875rem;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.list li:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.625rem;
+  width: 6px;
+  height: 6px;
+  background-color: #3d98f4;
+  border-radius: 50%;
+}
+
+.task:before {
+  background-color: #3d98f4;
+}
+
+.tip:before {
+  background-color: #ffb74d;
+}
+
+.nextStep {
+  color: #90adcb;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.nextStep:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.375rem;
+  width: 6px;
+  height: 6px;
+  background-color: #7e57c2;
+  border-radius: 50%;
+}
+
+.quizSection {
+  margin-top: 1.5rem;
+}
+
+.quizButton {
+  background-color: #3d98f4;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.875rem;
+}
+
+.quizButton:hover {
+  background-color: #2d88e4;
+}
+
+@media (min-width: 768px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .summaryGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

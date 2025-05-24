@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repository Onboarding Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Repository Onboarding Generator</h1>
+        
+        <p>Analyze a GitHub repository to generate a personalized onboarding path with tasks, tips, and knowledge checks.</p>
+        
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            <div class="form-group">
+                <label for="repo_url">GitHub Repository URL</label>
+                <input type="text" id="repo_url" name="repo_url" placeholder="https://github.com/username/repository" required value="{{ repo_url }}">
+                <small>Example: https://github.com/facebook/react</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="experience_level">Your Experience Level</label>
+                <select id="experience_level" name="experience_level">
+                    <option value="beginner" {% if experience_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                    <option value="intermediate" {% if experience_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                    <option value="advanced" {% if experience_level == 'advanced' %}selected{% endif %}>Advanced</option>
+                </select>
+            </div>
+            
+            <button type="submit">Generate Onboarding Path</button>
+        </form>
+        
+        {% if result %}
+        <div class="result">
+            <h2>Onboarding Path Generated</h2>
+            
+            <div id="learning-path">
+                <!-- Repository info -->
+                {% if result.repo_name %}
+                <div class="card">
+                    <h3>{{ result.repo_name }}</h3>
+                    <p>{{ result.repo_description }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Progress -->
+                <div class="card">
+                    <h3>Overall Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ result.overall_progress }}%;"></div>
+                    </div>
+                    <p>{{ result.overall_progress }}% complete</p>
+                </div>
+                
+                <!-- Chapters -->
+                <h2>Onboarding Chapters</h2>
+                {% for chapter in result.chapters %}
+                <div class="card">
+                    <h3>{{ chapter.id }}. {{ chapter.title }}</h3>
+                    <p>{{ chapter.description }}</p>
+                    
+                    <h4>Tasks</h4>
+                    <ul>
+                        {% for task in chapter.tasks %}
+                        <li>{{ task }}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h4>Tips</h4>
+                    <ul>
+                        {% for tip in chapter.tips %}
+                        <li>{{ tip }}</li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h4>Next Steps</h4>
+                    <p>{{ chapter.next_steps }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <h2>Raw JSON Data</h2>
+            <pre>{{ result_json }}</pre>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        // Simple script to toggle chapter details
+        document.addEventListener('DOMContentLoaded', function() {
+            const chapters = document.querySelectorAll('.card h3');
+            chapters.forEach(chapter => {
+                chapter.addEventListener('click', function() {
+                    const content = this.parentElement.querySelector('ul, p');
+                    if (content) {
+                        content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

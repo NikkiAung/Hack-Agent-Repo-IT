@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitHub Onboarding Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #101a23;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #182533;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: white;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            background-color: #223649;
+            border: 1px solid #314d68;
+            color: white;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3d98f4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .card {
+            background-color: #223649;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: white;
+        }
+        .card p {
+            color: #90adcb;
+        }
+        .card ul {
+            color: #90adcb;
+        }
+        .progress-container {
+            height: 8px;
+            background-color: #314d68;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #3d98f4;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+        .instructions {
+            background-color: #223649;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .instructions h2 {
+            margin-top: 0;
+        }
+        .instructions ol {
+            color: #90adcb;
+        }
+        #results {
+            display: none;
+            margin-top: 30px;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        .progress-text span {
+            color: #90adcb;
+        }
+        .progress-text span:last-child {
+            color: #3d98f4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Onboarding Generator</h1>
+        <p>Generate a personalized onboarding path for any GitHub repository.</p>
+        
+        <form id="repoForm">
+            <div>
+                <label for="repo_url">GitHub Repository URL:</label>
+                <input type="text" id="repo_url" name="repo_url" 
+                       placeholder="https://github.com/username/repository">
+            </div>
+            <div>
+                <label for="experience">Experience Level:</label>
+                <select id="experience" name="experience">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <button type="submit">Generate Onboarding Path</button>
+        </form>
+        
+        <div class="instructions">
+            <h2>How to Run the Full Application</h2>
+            <ol>
+                <li>Create a GitHub personal access token at <a href="https://github.com/settings/tokens" style="color: #3d98f4;">https://github.com/settings/tokens</a></li>
+                <li>Add the token to the <code>.env</code> file in the <code>GITHUB_TOKEN</code> field</li>
+                <li>Open a terminal in the backend directory</li>
+                <li>Run <code>./run_simple_form.sh</code> to start the server</li>
+                <li>Open <a href="http://localhost:8000" style="color: #3d98f4;">http://localhost:8000</a> in your browser</li>
+            </ol>
+        </div>
+        
+        <div id="results">
+            <h2>Generated Onboarding Path</h2>
+            
+            <div class="card">
+                <h3>Overall Progress</h3>
+                <div class="progress-container">
+                    <div id="overall-progress" class="progress-bar"></div>
+                </div>
+                <div class="progress-text">
+                    <span>Getting Started</span>
+                    <span id="progress-percentage">25%</span>
+                </div>
+            </div>
+            
+            <div id="chapters-container"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('repoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const repoUrl = document.getElementById('repo_url').value;
+            const experience = document.getElementById('experience').value;
+            
+            // Show results section
+            document.getElementById('results').style.display = 'block';
+            
+            // Parse repo name from URL
+            const repoName = repoUrl.split('/').pop() || 'example-repo';
+            
+            // Generate sample chapters
+            const chapters = [
+                {
+                    id: 1,
+                    title: "Repository Overview & Setup",
+                    description: `Get familiar with the ${repoName} repository and set up your local environment.`,
+                    tasks: [
+                        "Clone the repository locally",
+                        "Read the README.md file",
+                        "Identify the main components and features"
+                    ],
+                    tips: [
+                        "Pay special attention to any setup instructions in the README",
+                        "Look for .env.example files to configure your environment"
+                    ],
+                    next_steps: "Once your environment is set up, explore the codebase structure."
+                },
+                {
+                    id: 2,
+                    title: "Git Workflow & Branching",
+                    description: "Learn how the team uses Git for collaboration and development.",
+                    tasks: [
+                        "Understand the branching model (Git Flow, GitHub Flow, etc.)",
+                        "Learn branch naming conventions",
+                        "Practice creating a feature branch and making a commit"
+                    ],
+                    tips: [
+                        "Look for CONTRIBUTING.md or similar documentation",
+                        "Check the commit history to see patterns in commit messages"
+                    ],
+                    next_steps: "After understanding the Git workflow, explore the code style and architecture."
+                },
+                {
+                    id: 3,
+                    title: "Code Style & Linters",
+                    description: "Understand the coding standards and tools used to maintain code quality.",
+                    tasks: [
+                        "Identify linters and formatting tools (ESLint, Prettier, etc.)",
+                        "Set up your IDE with recommended extensions",
+                        "Run linters and fix any issues"
+                    ],
+                    tips: [
+                        "Look for .eslintrc, .prettierrc, or similar configuration files",
+                        "Check package.json for linting scripts"
+                    ],
+                    next_steps: "With your environment set up and code style understood, dive into the architecture."
+                },
+                {
+                    id: 4,
+                    title: "Testing & Quality Assurance",
+                    description: "Learn how the project ensures code quality through testing.",
+                    tasks: [
+                        "Identify the testing frameworks used",
+                        "Run the test suite",
+                        "Write a simple test for a feature"
+                    ],
+                    tips: [
+                        "Look for test directories like 'tests', '__tests__', etc.",
+                        "Check package.json or other config files for test scripts"
+                    ],
+                    next_steps: "After understanding testing, learn about the deployment process."
+                }
+            ];
+            
+            // Render chapters
+            const chaptersContainer = document.getElementById('chapters-container');
+            chaptersContainer.innerHTML = '';
+            
+            chapters.forEach(chapter => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                let html = `<h3>${chapter.id}. ${chapter.title}</h3>`;
+                html += `<p>${chapter.description}</p>`;
+                
+                html += `<h4>Tasks:</h4>`;
+                html += '<ul>';
+                chapter.tasks.forEach(task => {
+                    html += `<li>${task}</li>`;
+                });
+                html += '</ul>';
+                
+                html += `<h4>Tips:</h4>`;
+                html += '<ul>';
+                chapter.tips.forEach(tip => {
+                    html += `<li>${tip}</li>`;
+                });
+                html += '</ul>';
+                
+                html += `<h4>Next Steps:</h4>`;
+                html += `<p>${chapter.next_steps}</p>`;
+                
+                card.innerHTML = html;
+                chaptersContainer.appendChild(card);
+            });
+            
+            // Update progress
+            const progressBar = document.getElementById('overall-progress');
+            const progressPercentage = document.getElementById('progress-percentage');
+            
+            // Start with 0% width
+            progressBar.style.width = '0%';
+            progressPercentage.textContent = '0%';
+            
+            // Animate to 25% after a short delay
+            setTimeout(() => {
+                progressBar.style.width = '25%';
+                progressPercentage.textContent = '25%';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
