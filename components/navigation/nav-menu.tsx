@@ -23,6 +23,12 @@ export const NavMenu = ({ className }: NavMenuProps) => {
         <li>
           <NavLink href="/code">Code</NavLink>
         </li>
+        <li className="flex items-center">
+          <span className="text-gray-400 dark:text-gray-600">|</span>
+        </li>
+        <li>
+          <NavLink href="/dashboard">Dashboard</NavLink>
+        </li>
       </ul>
     </nav>
   );
