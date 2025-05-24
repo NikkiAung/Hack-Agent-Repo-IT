@@ -20,11 +20,11 @@ const Learn = () => {
                 <p className="text-white text-base font-medium">
                   Overall Progress
                 </p>
-                <p className="text-[#3d98f4] text-sm font-semibold">60%</p>
+                <p className="text-[#acd1e9] text-sm font-semibold">60%</p>
               </div>
               <div className="w-full bg-[#314d68] rounded-full h-2.5">
                 <div
-                  className="bg-[#3d98f4] h-2.5 rounded-full"
+                  className="bg-[#acd1e9] h-2.5 rounded-full"
                   style={{ width: "60%" }}
                 ></div>
               </div>
@@ -66,7 +66,7 @@ const Learn = () => {
                     <div className="shrink-0 flex items-center gap-3">
                       <div className="w-20 bg-[#314d68] rounded-full h-2">
                         <div
-                          className="bg-[#3d98f4] h-2 rounded-full"
+                          className="bg-[#acd1e9] h-2 rounded-full"
                           style={{ width: "80%" }}
                         ></div>
                       </div>
