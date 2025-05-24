@@ -22,9 +22,18 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 # === CrewAI core ===
-from crewai import Agent, Task, Crew, LLM  # type: ignore  # crewai pydantic
+from crewai import Agent, Task, Crew, LLM, Process  # type: ignore  # crewai pydantic
 from crewai.tools import BaseTool # type: ignore
+from crewai_tools import (DirectorySearchTool, FileReadTool, CodeDocsSearchTool)
 from typing import Type, Optional, Dict, Any, List
+from .custom_tools import (
+    GitHubRepoCloneTool,
+    CodeStructureAnalyzerTool,
+    DependencyAnalyzerTool,
+    GitHistoryAnalyzerTool,
+    DocumentationGeneratorTool,
+    ArchitectureDiagramTool
+)
 from pydantic import BaseModel, Field
 
 
@@ -369,42 +378,234 @@ tasks_catalog = {
 # 4. Crew assembly helper for applications
 # ----------------------------------------
 
-def get_crew() -> Crew:
-    """Return a Crew wired with all available Agents.
-
-    Apps can import this and call `crew.kickoff(inputs=…)`.
-    """
-
-    agents = [
-        RepoIngestor,
-        DependencyResolver,
-        EmbedIndexer,
-        BriefIntroSynthesizer,
-        ComponentMapper,
-        HeatmapAnalyst,
-        TaskContextFinder,
-        PRReviewer,
-        DiagramBot,
-        TutorBot,
-        WorkflowPlanner,
-    ]
-
-    # Dummy bootstrap task – real planners will enqueue their own.
-    bootstrap = Task(
-        description="Idle bootstrap – real execution starts via Planner agent.",
-        expected_output="workflow plan for repository analysis",
-        agent=WorkflowPlanner,
+def get_crew(repo_url: str) -> Crew:
+    """Create and configure the CrewAI crew for repository analysis"""
+    
+    # Initialize custom tools
+    github_clone_tool = GitHubRepoCloneTool()
+    code_analyzer_tool = CodeStructureAnalyzerTool()
+    dependency_tool = DependencyAnalyzerTool()
+    git_history_tool = GitHistoryAnalyzerTool()
+    doc_generator_tool = DocumentationGeneratorTool()
+    architecture_tool = ArchitectureDiagramTool()
+    
+    # Initialize CrewAI built-in tools
+    directory_search_tool = DirectorySearchTool()
+    file_read_tool = FileReadTool()
+    code_docs_search_tool = CodeDocsSearchTool()
+    
+    # Define agents with enhanced capabilities
+    repo_analyzer = Agent(
+        role="Repo Analyzer",
+        goal="Analyze repository structure, dependencies, and metadata to provide comprehensive insights",
+        backstory="""You are an expert repository analyst with deep knowledge of software architecture 
+        and development practices. You excel at quickly understanding codebases and identifying 
+        key patterns, dependencies, and structural elements.""",
+        verbose=True,
+        allow_delegation=False,
+        tools=[
+            github_clone_tool, 
+            dependency_tool, 
+            git_history_tool,
+            directory_search_tool,
+            file_read_tool
+        ],
+        llm=anthropic_llm
     )
-
-    return Crew(
-        agents=agents,
-        tasks=[bootstrap],
-        global_namespace={"tasks_catalog": tasks_catalog},
+    
+    code_insight_agent = Agent(
+        role="Code Insight Specialist",
+        goal="Perform deep code analysis to identify patterns, quality issues, and improvement opportunities",
+        backstory="""You are a senior software engineer with expertise in code quality, design patterns, 
+        and best practices across multiple programming languages. You can quickly identify code smells, 
+        architectural issues, and suggest improvements.""",
+        verbose=True,
+        allow_delegation=False,
+        tools=[
+            code_analyzer_tool, 
+            file_read_tool,
+            code_docs_search_tool,
+            directory_search_tool
+        ],
+        llm=anthropic_llm
     )
+    
+    architecture_agent = Agent(
+        role="Architecture Analyst",
+        goal="Analyze and document system architecture, component relationships, and design patterns",
+        backstory="""You are a solution architect with extensive experience in system design and 
+        architectural patterns. You excel at creating clear architectural documentation and 
+        identifying system boundaries and relationships.""",
+        verbose=True,
+        allow_delegation=False,
+        tools=[
+            code_analyzer_tool, 
+            architecture_tool,
+            dependency_tool,
+            directory_search_tool,
+            file_read_tool
+        ],
+        llm=anthropic_llm
+    )
+    
+    doc_generator = Agent(
+        role="Documentation Generator",
+        goal="Create comprehensive, clear, and useful documentation from code analysis",
+        backstory="""You are a technical writer with deep understanding of software development. 
+        You excel at creating documentation that is both comprehensive and accessible to 
+        developers of all skill levels.""",
+        verbose=True,
+        allow_delegation=False,
+        tools=[
+            doc_generator_tool, 
+            code_analyzer_tool,
+            file_read_tool,
+            directory_search_tool
+        ],
+        llm=anthropic_llm
+    )
+    
+    mentor_agent = Agent(
+        role="Development Mentor",
+        goal="Provide code review feedback, best practices guidance, and improvement suggestions",
+        backstory="""You are a senior developer and mentor with years of experience in code review 
+        and team leadership. You provide constructive feedback and actionable suggestions for 
+        code improvement and developer growth.""",
+        verbose=True,
+        allow_delegation=False,
+        tools=[
+            code_analyzer_tool, 
+            file_read_tool,
+            code_docs_search_tool,
+            directory_search_tool
+        ],
+        llm=anthropic_llm
+    )
+    
+    task_suggester = Agent(
+        role="Task Suggester",
+        goal="Analyze codebase to suggest development tasks, improvements, and next steps",
+        backstory="""You are a project manager and technical lead with expertise in identifying 
+        development opportunities and prioritizing technical debt. You excel at breaking down 
+        complex improvements into actionable tasks.""",
+        verbose=True,
+        allow_delegation=False,
+        tools=[
+            code_analyzer_tool, 
+            dependency_tool,
+            git_history_tool,
+            directory_search_tool,
+            file_read_tool
+        ],
+        llm=anthropic_llm
+    )
+    
+    # Define comprehensive tasks
+    analyze_task = Task(
+        description="""Analyze the repository at {repo_url}. Perform a comprehensive analysis including:
+        1. Clone the repository and examine its structure
+        2. Parse code files and extract architectural patterns
+        3. Analyze dependencies and their relationships
+        4. Extract key metrics (LOC, complexity, etc.)
+        5. Identify main technologies and frameworks used
+        6. Assess overall codebase health and organization
+        
+        Focus on providing actionable insights about the repository's structure and organization.""",
+        expected_output="A comprehensive repository analysis report including structure overview, dependency analysis, technology stack assessment, code metrics, and organizational insights.",
+        agent=repo_analyzer
+    )
+    
+    insight_task = Task(
+        description="""Based on the repository analysis, provide detailed code insights including:
+        1. Code quality assessment with specific metrics
+        2. Design patterns and architectural patterns identified
+        3. Code complexity analysis and hotspots
+        4. Technical debt identification
+        5. Security considerations and potential vulnerabilities
+        6. Performance optimization opportunities
+        7. Best practices compliance assessment
+        
+        Provide specific, actionable recommendations for improvement.""",
+        expected_output="A detailed code insight report with quality metrics, pattern analysis, technical debt assessment, security considerations, and prioritized improvement recommendations.",
+        agent=code_insight_agent
+    )
+    
+    architecture_task = Task(
+        description="""Create comprehensive architecture documentation including:
+        1. System architecture overview diagrams
+        2. Component relationship diagrams
+        3. Data flow diagrams
+        4. Module dependency graphs
+        5. API interaction diagrams (if applicable)
+        6. Database schema diagrams (if applicable)
+        
+        Use Mermaid syntax for all diagrams and provide clear explanations.""",
+        expected_output="Complete architecture documentation with multiple Mermaid diagrams showing system design, component relationships, data flows, and architectural patterns with detailed explanations.",
+        agent=architecture_agent
+    )
+    
+    documentation_task = Task(
+        description="""Generate comprehensive documentation improvements:
+        1. Analyze existing documentation quality
+        2. Suggest README.md improvements
+        3. Generate API documentation templates
+        4. Create contributing guidelines
+        5. Suggest inline code documentation improvements
+        6. Create setup and deployment guides
+        
+        Focus on making the project more accessible to new contributors.""",
+        expected_output="Documentation improvement plan with specific suggestions for README, API docs, contributing guidelines, and inline documentation enhancements.",
+        agent=doc_generator
+    )
+    
+    mentoring_task = Task(
+        description="""Provide development mentoring insights:
+        1. Identify learning opportunities from the codebase
+        2. Suggest skill development areas based on the technology stack
+        3. Recommend best practices specific to the project
+        4. Provide guidance on code review focus areas
+        5. Suggest resources for technology stack mastery
+        
+        Tailor recommendations to different experience levels.""",
+        expected_output="Personalized mentoring guide with learning opportunities, skill development recommendations, best practices guidance, and curated learning resources.",
+        agent=mentor_agent
+    )
+    
+    task_suggestion_task = Task(
+        description="""Generate actionable task suggestions:
+        1. Prioritize technical debt reduction tasks
+        2. Suggest feature enhancement opportunities
+        3. Identify refactoring candidates
+        4. Recommend testing improvements
+        5. Suggest performance optimization tasks
+        6. Identify security enhancement opportunities
+        
+        Provide clear priorities and effort estimates.""",
+        expected_output="Prioritized task list with specific actionable items, effort estimates, impact assessments, and implementation guidance for repository improvements.",
+        agent=task_suggester
+    )
+    
+    # Create and return crew with hierarchical process for better coordination
+    crew = Crew(
+        agents=[repo_analyzer, code_insight_agent, architecture_agent, doc_generator, mentor_agent, task_suggester],
+        tasks=[analyze_task, insight_task, architecture_task, documentation_task, mentoring_task, task_suggestion_task],
+        verbose=True,
+        process=Process.sequential,
+        memory=True,
+        embedder={
+            "provider": "openai",
+            "config": {
+                "model": "text-embedding-3-small"
+            }
+        }
+    )
+    
+    return crew
 
 
 # --- Entry‑point for local testing ---
 if __name__ == "__main__":
-    crew = get_crew()
-    result = crew.kickoff(inputs={"repo_url": "https://github.com/tiangolo/fastapi"})
+    repo_url = "https://github.com/tiangolo/fastapi"
+    crew = get_crew(repo_url)
+    result = crew.kickoff(inputs={"repo_url": repo_url})
     print("\n\n=== DEMO RESULT ===\n", result)

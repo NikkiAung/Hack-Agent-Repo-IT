@@ -1,36 +1,183 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Repository Analysis Platform
 
-## Getting Started
+An intelligent repository analysis platform powered by CrewAI agents, providing automated code analysis, architecture insights, and conversational assistance for software development teams.
 
-First, run the development server:
+## 🚀 Features
 
+- **Automatic Repository Ingestion**: Clone and analyze any GitHub repository
+- **AI-Powered Code Analysis**: Multi-agent system for comprehensive code understanding
+- **Architecture Visualization**: Generate architecture diagrams and documentation
+- **Conversational Assistant**: Chat with your repository using RAG-based AI
+- **Memory Layer**: Persistent knowledge storage with Neo4j and vector databases
+- **Modern Web Interface**: Next.js frontend with beautiful UI components
+
+## 🏗️ Architecture
+
+### Backend (Python)
+- **FastAPI**: RESTful API server
+- **CrewAI**: Multi-agent orchestration framework
+- **LangChain**: LLM integration and tooling
+- **Vector Databases**: Weaviate/Qdrant for embeddings
+- **Graph Database**: Neo4j for relationship mapping
+- **PostgreSQL**: Structured data storage
+
+### Frontend (Next.js)
+- **React 18**: Modern UI framework
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
+- **Radix UI**: Accessible component library
+- **NextAuth.js**: Authentication system
+
+### AI Agents
+1. **Repo Analyzer Agent**: Repository structure and metadata analysis
+2. **Code Insight Agent**: Deep code analysis and pattern detection
+3. **Architecture Agent**: System design and architecture documentation
+4. **Documentation Generator**: Automated documentation creation
+5. **Development Mentor**: Code review and improvement suggestions
+6. **Task Suggester**: Development task recommendations
+7. **Memory Agent**: Knowledge persistence and retrieval
+
+## 🛠️ Setup
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- Docker (optional, for databases)
+- Git
+
+### Environment Configuration
+
+1. Copy the environment template:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Configure your API keys and database connections in `.env`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Required: At least one LLM API key
+OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Vector Database (choose one)
+WEAVIATE_URL=http://localhost:8080
+QDRANT_URL=http://localhost:6333
 
-## Learn More
+# Graph Database
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=your_password
 
-To learn more about Next.js, take a look at the following resources:
+# PostgreSQL
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=repo_analysis
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend Setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Install Python dependencies:
+```bash
+pip install -e .
+```
 
-## Deploy on Vercel
+2. Start the FastAPI server:
+```bash
+python server.py
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The API will be available at `http://localhost:8000`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Frontend Setup
+
+1. Install Node.js dependencies:
+```bash
+npm install
+```
+
+2. Start the development server:
+```bash
+npm run dev
+```
+
+The frontend will be available at `http://localhost:3000`
+
+## 📖 Usage
+
+### Analyzing a Repository
+
+1. **Via Web Interface:**
+   - Open `http://localhost:3000`
+   - Enter a GitHub repository URL
+   - Click "Analyze Repository"
+   - Wait for the analysis to complete
+
+2. **Via API:**
+```bash
+curl -X POST "http://localhost:8000/api/analyze" \
+  -H "Content-Type: application/json" \
+  -d '{"repo_url": "https://github.com/user/repo"}'
+```
+
+### Chatting with Repository
+
+1. **Via Web Interface:**
+   - Navigate to an analyzed repository
+   - Use the chat interface to ask questions
+
+2. **Via API:**
+```bash
+curl -X POST "http://localhost:8000/api/chat" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "repo_id": "repo_id_here",
+    "message": "How does the authentication system work?"
+  }'
+```
+
+## 🔧 Development
+
+### Project Structure
+
+```
+├── backend/
+│   ├── agents/          # CrewAI agents and tools
+│   ├── api/             # FastAPI routes and models
+│   ├── services/        # Business logic services
+│   └── config.py        # Configuration management
+├── app/                 # Next.js frontend
+├── components/          # React components
+├── lib/                 # Utility libraries
+├── server.py           # FastAPI server entry point
+├── main.py             # CrewAI crew entry point
+└── pyproject.toml      # Python dependencies
+```
+
+### Adding New Agents
+
+1. Create a new agent class in `backend/agents/`
+2. Define the agent's role, goal, and backstory
+3. Assign relevant tools to the agent
+4. Add the agent to the crew in `get_crew()` function
+
+### Adding New Tools
+
+1. Create a tool class inheriting from `BaseTool`
+2. Implement the `_run()` method
+3. Add proper error handling and logging
+4. Register the tool with relevant agents
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details
