@@ -66,43 +66,6 @@ export default async function Home() {
       <div className="mb-12">
         <RepositoryHealthSnapshot />
       </div>
-
-      {/* Enhanced AI Agent Button */}
-      <div className="fixed bottom-8 right-8 z-40">
-        <button
-          aria-label="Chat with AI Agent"
-          className="group relative flex items-center justify-center gap-3 h-16 px-8 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-2xl shadow-2xl hover:shadow-primary/25 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary transition-all duration-300 animate-pulse-glow hover-lift"
-        >
-          {/* Animated background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-accent/80 rounded-2xl blur-sm group-hover:blur-md transition-all duration-300" />
-
-          {/* Content */}
-          <div className="relative flex items-center gap-3">
-            <svg
-              className="h-7 w-7 transform group-hover:rotate-12 group-hover:scale-110 transition-transform duration-300"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-3.862 8.25-8.625 8.25S3.75 16.556 3.75 12 7.612 3.75 12.375 3.75 21 7.444 21 12z"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className="text-lg font-bold tracking-wide">AI Agent</span>
-          </div>
-
-          {/* Floating particles effect */}
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-ping" />
-          <div
-            className="absolute -bottom-1 -left-1 w-2 h-2 bg-primary rounded-full animate-ping"
-            style={{ animationDelay: "1s" }}
-          />
-        </button>
-      </div>
     </main>
   );
 }

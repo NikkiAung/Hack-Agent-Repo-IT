@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import AppNav from "@/components/navigation/app-nav";
 import Footer from "@/components/navigation/footer";
+import AiAgentChatbot from "@/components/chatbot/ai-agent-chatbot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,6 +49,8 @@ export default function RootLayout({
           </div>
           <Footer />
         </div>
+        {/* Enhanced AI Agent Button */}
+        <AiAgentChatbot apiEndpoint={"dummy-point"} apiKey={"dummy-key"} />
       </body>
     </html>
   );
